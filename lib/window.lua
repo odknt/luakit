@@ -378,7 +378,7 @@ _M.methods = {
         local uri, title = w.view.uri, w.view.title
         title = (title or "luakit") .. ((uri and " - " .. uri) or "")
         local max = settings.window.max_title_len
-        if #title > max then title = string.sub(title, 1, max) .. "..." end
+        if utf8.len(title) > max then title = utf8.sub(title, 1, max) .. "..." end
         w.win.title = title
     end,
 
