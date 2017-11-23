@@ -36,6 +36,51 @@ abspos(ssize_t offset, size_t length) {
     return (size_t) offset;
 }
 
+/* UTF8 substring
+ * Returns the number of elements pushed on the stack. */
+static gint
+luaH_utf8_sub(lua_State *L)
+{
+    gchar *ret;
+    gchar *pbeg;
+    gchar *pend;
+    size_t blen;
+    ssize_t slen;
+    const gchar *str = luaL_checklstring(L, 1, &blen);
+    ssize_t beg = luaL_checkinteger(L, 2);
+    ssize_t end = luaL_optinteger(L, 3, -1);
+
+    if (beg > 0) beg--; /* adjust to 0-based */
+
+    if (!g_utf8_validate(str, blen, NULL)) {
+        lua_pushliteral(L, "");
+        return 1;
+    }
+
+    slen = g_utf8_strlen(str, blen);
+
+    /* for negative */
+    if (beg < 0) beg = slen + beg;
+    if (end < 0) end = slen + end + 1;
+
+    beg = CLAMP(beg, 0, slen);
+    end = CLAMP(end, 0, slen);
+
+    pbeg = g_utf8_offset_to_pointer(str, beg);
+    pend = g_utf8_offset_to_pointer(str, end);
+
+    blen = pend - pbeg;
+    if (blen == 0) {
+        lua_pushliteral(L, "");
+        return 1;
+    }
+    ret = lua_newuserdata(L, blen);
+    g_utf8_strncpy(ret, pbeg, end);
+
+    lua_pushstring(L, ret);
+    return 1;
+}
+
 /* UTF8 aware string length computing.
  * Returns the number of elements pushed on the stack. */
 static gint
@@ -123,6 +168,7 @@ utf8_lib_setup(lua_State *L)
     {
         { "len", luaH_utf8_len },
         { "offset", luaH_utf8_offset },
+        { "sub", luaH_utf8_sub },
         { NULL, NULL }
     };
 
