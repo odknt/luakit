@@ -40,6 +40,23 @@ T.test_utf8_offset = function ()
     assert.has.errors(function() utf8.offset("äaäaä", 1, 5) end)
 end
 
+T.test_utf8_sub = function ()
+    assert.equal("", utf8.sub("äaäaä", 0, 0))
+    assert.equal("ä", utf8.sub("äaäaä", 0, 1))
+    assert.equal("ä", utf8.sub("äaäaä", 1, 1))
+    assert.equal("äa", utf8.sub("äaäaä", 1, 2))
+    assert.equal("äaä", utf8.sub("äaäaä", 1, 3))
+    assert.equal("äaäa", utf8.sub("äaäaä", 1, 4))
+    assert.equal("äaäaä", utf8.sub("äaäaä", 1, 5))
+    assert.equal("äaäaä", utf8.sub("äaäaä", 1, -1))
+    assert.equal("aä", utf8.sub("äaäaä", 4, -1))
+    assert.equal("äaä", utf8.sub("äaäaä", -3, -1))
+    assert.equal("äaäaä", utf8.sub("äaäaä", -6))
+    assert.equal("äaäaä", utf8.sub("äaäaä", 1, 20))
+    assert.equal("", utf8.sub("äaäaä", 1, -20))
+    -- corner cases and errors
+end
+
 return T
 
 -- vim: et:sw=4:ts=8:sts=4:tw=80
